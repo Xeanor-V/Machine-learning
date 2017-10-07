@@ -1,7 +1,9 @@
 import numpy as np, pylab, random, math
-from cvxopt.solvers import qp 
+import cvxopt
+
 from cvxopt.base import matrix
 
+##The larger the alpha value, the more important the point is to us 
 ##from sklearn import svm
 ## P matrix, t
 ## equation 6
@@ -45,8 +47,6 @@ def Build_Indicator(Alpha,Points,T):
         res += Alpha[i]*T[i]*Linear_Kernel(Points,Points[i])
     return res
 
-    
-
 T = np.array([1,-1])
 X = np.array([2,1])
 Y = np.array([3,4])
@@ -66,5 +66,35 @@ alpha = list ( r [ 'x' ])
 Alpha,Points = Build_NonZero(alpha,X,Y)
 indicator = Build_Indicator(Alpha,Points,T)
 print(indicator)
+
+##Generate Test Data
+classA = [(random.normalvariate(-1.5, 1), 
+            random.normalvariate(0.5, 1), 
+            1.0)
+            for i in range(5)] + \
+            [(random.normalvariate(1.5, 1), 
+            random.normalvariate(0.5, 1), 
+            1.0)
+            for i in range(5)]
+
+classB = [(random.normalvariate(0.0, 0.5), 
+            random.normalvariate(-0.5, 0.5), 
+            -1.0)
+            for i in range(10)]
+
+data = classA + classB 
+random. shuffle (data)
+
+pylab.hold (True) 
+pylab.plot([p[0] for p in classA], 
+            [p[1] for p in classA],
+            'bo')
+pylab.plot([p[0] for p in classA], 
+            [p[1] for p in classB], 
+            'ro')
+pylab.show()
+
+
+
 
 
