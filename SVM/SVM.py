@@ -1,6 +1,6 @@
 import numpy as np, pylab, random, math
-import cvxopt
 
+from cvxopt.solvers import qp
 from cvxopt.base import matrix
 
 ##The larger the alpha value, the more important the point is to us 
@@ -94,6 +94,17 @@ pylab.plot([p[0] for p in classA],
             'ro')
 pylab.show()
 
+## Plotting the Decision Boundary
+#values go from -4 to 4 with a step of 0.05
+xrange = np.arange(-4, 4, 0.05)
+yrange = np.arange(-4, 4, 0.05)
+
+grid = matrix([[indicator(x,y) for y in yrange] for x in xrange])
+#
+#pylab.contour(xrange, yrange, grid,
+#              (-1.0, 0.0, 1.0),
+#              colors=('red', 'black', 'blue'),
+#              linewidths=(1, 3, 1))
 
 
 
