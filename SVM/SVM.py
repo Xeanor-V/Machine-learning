@@ -63,7 +63,7 @@ def build_nonzero(alpha_values,data):
     return np.array(points)
 
 #tells us which side of the decision boundary the point in on
-def build_indicator(alpha,psoints,T):
+def build_indicator(alpha,points):
     res = 0.0
     for i in range(len(alpha)):
         res += alpha[i]*T[i]*linear_kernel(points,points[i])
@@ -78,8 +78,8 @@ h = build_h(N)
 r = qp(matrix(P) , matrix(q) , matrix(G) , matrix(h))
 alpha = list(r['x'])
 
-points = build_nonzero(alpha,X,Y)
-indicator = build_indicator(alpha,points,T)
+points = build_nonzero(alpha,data)
+indicator = build_indicator(alpha,points)
 ##print(indicator)
 
 ## Plot test data
