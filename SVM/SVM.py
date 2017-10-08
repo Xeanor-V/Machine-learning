@@ -30,6 +30,9 @@ def linear_kernel(X, Y):
 def polynomial_kernel(X,Y,p):
     return linear_kernel(X,Y)**p
 
+def radial_basis_kernel(X,Y,s):
+    return math.exp(-((X-Y)**2/2*s**2))
+
 #Building matrix / vector functions
 def build_P(data):
     t = [x[2] for x in data]
@@ -53,7 +56,7 @@ def build_G(N):
                 g_matrix[i][j] = -1
     return np.array(g_matrix, dtype = np.dtype('d'))
 
-def build_nonzero(alpha_values,data):
+def find_nonzero_values(alpha_values,data):
     sp_vectors = []
     epsilon = 0.00001
     for i in range(len(alpha_values)):
@@ -66,8 +69,6 @@ def indicator(sp_vectors, vector):
     res = 0.0
     epsilon = 0.00001
     for i in range(len(sp_vectors)):
-        ##print(sp_vectors[i][0:2])
-        ##print(vector)
         res += sp_vectors[i][3]*sp_vectors[i][2]*linear_kernel(np.array(sp_vectors[i][0:2]),np.array(vector))
     if(res < 0):
          return -1.0
@@ -75,7 +76,6 @@ def indicator(sp_vectors, vector):
          return 1.0
     else:
         return 0.0
-    
 
 N = len(data)
 P = build_P(data)
@@ -88,7 +88,7 @@ alpha_values = list(r['x'])
 support_vectors = find_nonzero_values(alpha_values,data)
 alpha = list(r['x'])
 
-sp_vectors = build_nonzero(alpha,data)
+sp_vectors = find_nonzero_values(alpha,data)
 print(sp_vectors)
 ##indicator = build_indicator(alpha,points)
 ##print(indicator)
@@ -115,7 +115,6 @@ pylab.contour(xrange, yrange, grid,
               (-1.0, 0.0, 1.0),
               colors=('red', 'black', 'blue'),
               linewidths=(1, 3, 1))
-
 pylab.show()
 
 
