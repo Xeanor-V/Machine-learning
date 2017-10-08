@@ -85,6 +85,8 @@ G = build_G(N)
 h = build_h(N)
 
 r = qp(matrix(P) , matrix(q) , matrix(G) , matrix(h))
+alpha_values = list(r['x'])
+support_vectors = find_nonzero_values(alpha_values,data)
 alpha = list(r['x'])
 
 sp_vectors = build_nonzero(alpha,data)
