@@ -53,15 +53,14 @@ def Build_G(N):
                 G_Matrix[i][j] = -1
     return np.array(G_Matrix, dtype = np.dtype('d'))
 
-def Build_NonZero(Alpha_Values,X,Y):
+def Build_NonZero(Alpha_Values,data):
     Alpha = []
     Points = []
     epsilon = 0.00001
     for i in range(len(Alpha_Values)):
         if(math.fabs(Alpha_Values[i]) > epsilon):
-            Alpha.append(Alpha_Values[i])
-            Points.append([X[i], Y[i]])
-    return np.array(Alpha), np.array(Points)
+            Points.append(data[i])
+    return np.array(Points)
 
 #tells us which side of the decision boundary the point in on
 def Build_Indicator(Alpha,Points,T):
