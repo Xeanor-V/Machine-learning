@@ -23,16 +23,21 @@ classB = [(random.normalvariate(0.0, 0.5),
 data = classA + classB
 random.shuffle(data)
 
-def Linear_Kernel(X, Y):
+#Kernel Functions
+def linear_kernel(X, Y):
     return np.dot(X, Y.T) + 1
 
-def Build_P(data):
+def polynomial_kernel(X,Y,p):
+    return linear_kernel(X,Y)**p
+
+#Building matrix / vector functions
+def build_P(data):
     t = [x[2] for x in data]
-    P_Matrix = [[0 for x in range(len(data))] for y in range(len(data))]
+    p_matrix = [[0 for x in range(len(data))] for y in range(len(data))]
     for i in range(len(data)):
         for j in range(len(data)):
-            P_Matrix[i][j] = t[i]*t[j] * Linear_Kernel(np.array(data[i][0:1]),np.array(data[j][0:1]))
-    return np.array(P_Matrix, dtype = np.dtype('d'))
+            p_matrix[i][j] = t[i]*t[j] * linear_kernel(np.array(data[i][0:1]),np.array(data[j][0:1]))
+    return np.array(p_matrix, dtype = np.dtype('d'))
 
 def Build_q(N):
     return np.ones(N) * -1
@@ -58,6 +63,7 @@ def Build_NonZero(Alpha_Values,X,Y):
             Points.append([X[i], Y[i]])
     return np.array(Alpha), np.array(Points)
 
+#tells us which side of the decision boundary the point in on
 def Build_Indicator(Alpha,Points,T):
     res = 0.0
     for i in range(len(Alpha)):
