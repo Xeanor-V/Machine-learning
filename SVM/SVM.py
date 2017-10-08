@@ -53,18 +53,17 @@ def build_G(N):
                 g_matrix[i][j] = -1
     return np.array(g_matrix, dtype = np.dtype('d'))
 
-def build_nonzero(alpha_values,X,Y):
+def build_nonzero(alpha_values,data):
     alpha = []
     points = []
     epsilon = 0.00001
     for i in range(len(alpha_values)):
         if(math.fabs(alpha_values[i]) > epsilon):
-            alpha.append(alpha_values[i])
-            points.append([X[i], Y[i]])
-    return np.array(alpha), np.array(points)
+            points.append(data[i])
+    return np.array(points)
 
-#Tells us which side of the decision boundary the point in on
-def build_indicator(alpha,points,T):
+#tells us which side of the decision boundary the point in on
+def build_indicator(alpha,psoints,T):
     res = 0.0
     for i in range(len(alpha)):
         res += alpha[i]*T[i]*linear_kernel(points,points[i])
