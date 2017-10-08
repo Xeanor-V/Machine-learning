@@ -39,54 +39,51 @@ def build_P(data):
             p_matrix[i][j] = t[i]*t[j] * linear_kernel(np.array(data[i][0:1]),np.array(data[j][0:1]))
     return np.array(p_matrix, dtype = np.dtype('d'))
 
-def Build_q(N):
+def build_q(N):
     return np.ones(N) * -1
 
-def Build_h(N):
+def build_h(N):
     return np.zeros(N)
 
-def Build_G(N):
-    G_Matrix = [[0 for x in range(N)] for y in range(N)] 
+def build_G(N):
+    g_matrix = [[0 for x in range(N)] for y in range(N)]
     for i in range(N):
         for j in range(N):
             if(i==j):
-                G_Matrix[i][j] = -1
-    return np.array(G_Matrix, dtype = np.dtype('d'))
+                g_matrix[i][j] = -1
+    return np.array(g_matrix, dtype = np.dtype('d'))
 
-def Build_NonZero(Alpha_Values,X,Y):
-    Alpha = []
-    Points = []
+def build_nonzero(alpha_values,X,Y):
+    alpha = []
+    points = []
     epsilon = 0.00001
-    for i in range(len(Alpha_Values)):
-        if(math.fabs(Alpha_Values[i]) > epsilon):
-            Alpha.append(Alpha_Values[i])
-            Points.append([X[i], Y[i]])
-    return np.array(Alpha), np.array(Points)
+    for i in range(len(alpha_values)):
+        if(math.fabs(alpha_values[i]) > epsilon):
+            alpha.append(alpha_values[i])
+            points.append([X[i], Y[i]])
+    return np.array(alpha), np.array(points)
 
-#tells us which side of the decision boundary the point in on
-def Build_Indicator(Alpha,Points,T):
+#Tells us which side of the decision boundary the point in on
+def build_indicator(alpha,points,T):
     res = 0.0
-    for i in range(len(Alpha)):
-        res += Alpha[i]*T[i]*Linear_Kernel(Points,Points[i])
+    for i in range(len(alpha)):
+        res += alpha[i]*T[i]*linear_kernel(points,points[i])
     return res
 
 N = len(data)
-P = Build_P(data)
-q = Build_q(N)
-G = Build_G(N)
-h = Build_h(N)
-
-##print(len(Q))
-##print(Linear_Kernel(X,Y))
+P = build_P(data)
+q = build_q(N)
+G = build_G(N)
+h = build_h(N)
 
 r = qp(matrix(P) , matrix(q) , matrix(G) , matrix(h))
 alpha = list(r['x'])
 
-Alpha,Points = Build_NonZero(alpha,X,Y)
-indicator = Build_Indicator(Alpha,Points,T)
+points = build_nonzero(alpha,X,Y)
+indicator = build_indicator(alpha,points,T)
 ##print(indicator)
 
-##Plot test data
+## Plot test data
 pylab.hold (True) 
 pylab.plot([p[0] for p in classA], 
             [p[1] for p in classA],
@@ -96,8 +93,7 @@ pylab.plot([p[0] for p in classA],
             'ro')
 pylab.show()
 
-## Plotting the Decision Boundary
-#values go from -4 to 4 with a step of 0.05
+## Plot the decision boundary
 xrange = np.arange(-4, 4, 0.05)
 yrange = np.arange(-4, 4, 0.05)
 
