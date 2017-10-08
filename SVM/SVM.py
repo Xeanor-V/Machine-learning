@@ -3,18 +3,35 @@ import numpy as np, pylab, random, math
 from cvxopt.solvers import qp
 from cvxopt.base import matrix
 
-##The larger the alpha value, the more important the point is to us 
-##from sklearn import svm
-## P matrix, t
-## equation 6
+##The larger the alpha value, the more important the point is to us
+
+##Generate Test Data
+classA = [(random.normalvariate(-1.5, 1),
+           random.normalvariate(0.5, 1),
+           1.0)
+          for i in range(5)] + \
+    [(random.normalvariate(1.5, 1),
+      random.normalvariate(0.5, 1),
+      1.0)
+     for i in range(5)]
+
+classB = [(random.normalvariate(0.0, 0.5),
+           random.normalvariate(-0.5, 0.5),
+           -1.0)
+          for i in range(10)]
+
+data = classA + classB
+random.shuffle(data)
+
 def Linear_Kernel(X, Y):
     return np.dot(X, Y.T) + 1
 
-def Build_P(X,t):
-    P_Matrix = [[0 for x in range(len(X))] for y in range(len(X))] 
-    for i in range(len(X)):
-        for j in range(len(X)):
-            P_Matrix[i][j] = t[i]*t[j] * Linear_Kernel(X[i],X[j])
+def Build_P(data):
+    t = [x[2] for x in data]
+    P_Matrix = [[0 for x in range(len(data))] for y in range(len(data))]
+    for i in range(len(data)):
+        for j in range(len(data)):
+            P_Matrix[i][j] = t[i]*t[j] * Linear_Kernel(np.array(data[i][0:1]),np.array(data[j][0:1]))
     return np.array(P_Matrix, dtype = np.dtype('d'))
 
 def Build_q(N):
@@ -47,44 +64,23 @@ def Build_Indicator(Alpha,Points,T):
         res += Alpha[i]*T[i]*Linear_Kernel(Points,Points[i])
     return res
 
-T = np.array([1,-1])
-X = np.array([2,1])
-Y = np.array([3,4])
-N = len(X)
+N = len(data)
+P = Build_P(data)
 q = Build_q(N)
-P = Build_P(X,T)
 G = Build_G(N)
 h = Build_h(N)
 
 ##print(len(Q))
-print(Linear_Kernel(X,Y))
+##print(Linear_Kernel(X,Y))
 
-
-r = qp( matrix(P) , matrix(q) , matrix(G) , matrix(h)) 
-alpha = list ( r [ 'x' ])
+r = qp(matrix(P) , matrix(q) , matrix(G) , matrix(h))
+alpha = list(r['x'])
 
 Alpha,Points = Build_NonZero(alpha,X,Y)
 indicator = Build_Indicator(Alpha,Points,T)
-print(indicator)
+##print(indicator)
 
-##Generate Test Data
-classA = [(random.normalvariate(-1.5, 1), 
-            random.normalvariate(0.5, 1), 
-            1.0)
-            for i in range(5)] + \
-            [(random.normalvariate(1.5, 1), 
-            random.normalvariate(0.5, 1), 
-            1.0)
-            for i in range(5)]
-
-classB = [(random.normalvariate(0.0, 0.5), 
-            random.normalvariate(-0.5, 0.5), 
-            -1.0)
-            for i in range(10)]
-
-data = classA + classB 
-random. shuffle (data)
-
+##Plot test data
 pylab.hold (True) 
 pylab.plot([p[0] for p in classA], 
             [p[1] for p in classA],
@@ -107,7 +103,5 @@ pylab.contour(xrange, yrange, grid,
               (-1.0, 0.0, 1.0),
               colors=('red', 'black', 'blue'),
               linewidths=(1, 3, 1))
-
-
 
 
