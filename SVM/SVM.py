@@ -17,8 +17,8 @@ classA = [(random.normalvariate(-1.5, 1),
       1.0)
      for i in range(5)]
 
-classB = [(random.normalvariate(1.5, 1),
-           random.normalvariate(0.5, 1),
+classB = [(random.normalvariate(10, 1),
+           random.normalvariate(10, 1),
            -1.0)
           for i in range(10)]
 
@@ -30,7 +30,10 @@ def linear_kernel(X, Y):
     return np.dot(X, Y.T) + 1
 
 def polynomial_kernel(X,Y,p):
-    return linear_kernel(X,Y.T)**p
+    return linear_kernel(X,Y)**p
+
+def radial_basis_kernel(X,Y,s):
+    return math.exp(-((X-Y)**2/2*s**2))
 
 #Building matrix / vector functions
 def build_P(data):
@@ -38,7 +41,7 @@ def build_P(data):
     p_matrix = [[0 for x in range(len(data))] for y in range(len(data))]
     for i in range(len(data)):
         for j in range(len(data)):
-            p_matrix[i][j] = t[i]*t[j] * polynomial_kernel(np.array(data[i][0:2]),np.array(data[j][0:2]),5)
+            p_matrix[i][j] = t[i]*t[j] * linear_kernel(np.array(data[i][0:2]),np.array(data[j][0:2]))
     return np.array(p_matrix, dtype = np.dtype('d'))
 
 def build_q(N):
@@ -68,15 +71,8 @@ def indicator(sp_vectors, vector):
     res = 0.0
     epsilon = 0.0000000001
     for i in range(len(sp_vectors)):
-        ##print(sp_vectors[i][0:2])
-        ##print(vector)
-        res += sp_vectors[i][3]*sp_vectors[i][2]*polynomial_kernel(np.array(sp_vectors[i][0:2]),np.array(vector),5)
+        res += sp_vectors[i][3]*sp_vectors[i][2]*linear_kernel(np.array(sp_vectors[i][0:2]),np.array(vector))
     return res
-    #if res >0 :
-    #    return 1
-    #else:
-    #    return -1
-    
 
 N = len(data)
 P = build_P(data)
@@ -85,8 +81,8 @@ G = build_G(N)
 h = build_h(N)
 
 r = qp(matrix(P) , matrix(q) , matrix(G) , matrix(h))
-##alpha_values = list(r['x'])
-##support_vectors = find_nonzero_values(alpha_values,data)
+alpha_values = list(r['x'])
+support_vectors = find_nonzero_values(alpha_values,data)
 alpha = list(r['x'])
 
 sp_vectors = find_nonzero_values(alpha,data)
@@ -117,5 +113,4 @@ pylab.contour(xrange, yrange, grid,
               (-1.0, 0.0, 1.0),
               colors=('red', 'black', 'blue'),
               linewidths=(1, 3, 1))
-            
 pylab.show()
