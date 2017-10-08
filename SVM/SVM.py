@@ -1,7 +1,9 @@
 import numpy as np, pylab, random, math
-from cvxopt.solvers import qp 
+
+from cvxopt.solvers import qp
 from cvxopt.base import matrix
 
+##The larger the alpha value, the more important the point is to us 
 ##from sklearn import svm
 ## P matrix, t
 ## equation 6
@@ -29,23 +31,22 @@ def Build_G(N):
                 G_Matrix[i][j] = -1
     return np.array(G_Matrix, dtype = np.dtype('d'))
 
-def Build_NonZero(Alpha_Values,X,Y):
+def Build_NonZero(Alpha_Values,data):
     Alpha = []
     Points = []
     epsilon = 0.00001
     for i in range(len(Alpha_Values)):
         if(math.fabs(Alpha_Values[i]) > epsilon):
-            Alpha.append(Alpha_Values[i])
-            Points.append([X[i], Y[i]])
-    return np.array(Alpha), np.array(Points)
+            Points.append(data[i])
+    return np.array(Points)
 
-def Build_Indicator(Alpha,Points,T):
-    res = 0.0
-    for i in range(len(Alpha)):
-        res += Alpha[i]*T[i]*Linear_Kernel(Points,Points[i])
+def Indicator(Alpha,data,points):
+    res = []
+    for i in range(len(points)):
+        current = 0.0
+        for j in range(len(data)):
+            res += Alpha[i]*Points[i][2]*Linear_Kernel(Points,Points[i])
     return res
-
-    
 
 T = np.array([1,-1])
 X = np.array([2,1])
@@ -63,8 +64,47 @@ print(Linear_Kernel(X,Y))
 r = qp( matrix(P) , matrix(q) , matrix(G) , matrix(h)) 
 alpha = list ( r [ 'x' ])
 
-Alpha,Points = Build_NonZero(alpha,X,Y)
+Points = Build_NonZero(alpha,data)
 indicator = Build_Indicator(Alpha,Points,T)
 print(indicator)
 
+##Generate Test Data
+classA = [(random.normalvariate(-1.5, 1), 
+            random.normalvariate(0.5, 1), 
+            1.0)
+            for i in range(5)] + \
+            [(random.normalvariate(1.5, 1), 
+            random.normalvariate(0.5, 1), 
+            1.0)
+            for i in range(5)]
 
+classB = [(random.normalvariate(0.0, 0.5), 
+            random.normalvariate(-0.5, 0.5), 
+            -1.0)
+            for i in range(10)]
+
+data = classA + classB 
+random. shuffle (data)
+
+pylab.hold (True) 
+pylab.plot([p[0] for p in classA], 
+            [p[1] for p in classA],
+            'bo')
+pylab.plot([p[0] for p in classA], 
+            [p[1] for p in classB], 
+            'ro')
+pylab.show()
+
+## Plotting the Decision Boundary
+#values go from -4 to 4 with a step of 0.05
+xrange = np.arange(-4, 4, 0.05)
+yrange = np.arange(-4, 4, 0.05)
+
+grid = matrix([[indicator[x][y]
+                for y in yrange]
+               for x in xrange])
+
+pylab.contour(xrange, yrange, grid,
+              (-1.0, 0.0, 1.0),
+              colors=('red', 'black', 'blue'),
+              linewidths=(1, 3, 1))
