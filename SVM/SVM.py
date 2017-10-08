@@ -3,8 +3,10 @@ import numpy as np, pylab, random, math
 from cvxopt.solvers import qp
 from cvxopt.base import matrix
 
-##The larger the alpha value, the more important the point is to us
-
+## The larger the alpha value, the more important the point is to us
+## for slack G int the second hald becomes 1
+## for slack H becomes [0... ][C]
+## if there's n
 ##Generate Test Data
 classA = [(random.normalvariate(-1.5, 1),
            random.normalvariate(0.5, 1),
@@ -15,8 +17,8 @@ classA = [(random.normalvariate(-1.5, 1),
       1.0)
      for i in range(5)]
 
-classB = [(random.normalvariate(0.0, 0.5),
-           random.normalvariate(-0.5, 0.5),
+classB = [(random.normalvariate(10, 1),
+           random.normalvariate(10, 1),
            -1.0)
           for i in range(10)]
 
@@ -64,17 +66,16 @@ def build_nonzero(alpha_values,data):
 #tells us which side of the decision boundary the point in on
 def indicator(sp_vectors, vector):
     res = 0.0
-    epsilon = 0.00001
+    epsilon = 0.0000000001
     for i in range(len(sp_vectors)):
         ##print(sp_vectors[i][0:2])
         ##print(vector)
         res += sp_vectors[i][3]*sp_vectors[i][2]*linear_kernel(np.array(sp_vectors[i][0:2]),np.array(vector))
-    if(res < 0):
-         return -1.0
-    elif(math.fabs(res) > epsilon):
-         return 1.0
-    else:
-        return 0.0
+    return res
+    #if res >0 :
+    #    return 1
+    #else:
+    #    return -1
     
 
 N = len(data)
@@ -97,13 +98,14 @@ pylab.hold (True)
 pylab.plot([p[0] for p in classA], 
             [p[1] for p in classA],
             'bo')
-pylab.plot([p[0] for p in classA], 
+pylab.plot([p[0] for p in classB], 
             [p[1] for p in classB], 
             'ro')
 
+
 ## Plot the decision boundary
-xrange = np.arange(-4, 4, 0.05)
-yrange = np.arange(-4, 4, 0.05)
+xrange = np.arange(-10, 10, 0.05)
+yrange = np.arange(-10, 10, 0.05)
 
 grid = matrix([[ indicator(sp_vectors, [x,y])
                 for y in yrange]
@@ -113,7 +115,5 @@ pylab.contour(xrange, yrange, grid,
               (-1.0, 0.0, 1.0),
               colors=('red', 'black', 'blue'),
               linewidths=(1, 3, 1))
-
+            
 pylab.show()
-
-
