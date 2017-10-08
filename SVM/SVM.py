@@ -99,12 +99,14 @@ pylab.show()
 xrange = np.arange(-4, 4, 0.05)
 yrange = np.arange(-4, 4, 0.05)
 
-grid = matrix([[indicator(x,y) for y in yrange] for x in xrange])
-#
-#pylab.contour(xrange, yrange, grid,
-#              (-1.0, 0.0, 1.0),
-#              colors=('red', 'black', 'blue'),
-#              linewidths=(1, 3, 1))
+grid = matrix([[indicator(x,y)
+                for y in yrange]
+               for x in xrange])
+
+pylab.contour(xrange, yrange, grid,
+              (-1.0, 0.0, 1.0),
+              colors=('red', 'black', 'blue'),
+              linewidths=(1, 3, 1))
 
 
 
