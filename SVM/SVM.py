@@ -53,7 +53,7 @@ def build_G(N):
                 g_matrix[i][j] = -1
     return np.array(g_matrix, dtype = np.dtype('d'))
 
-def build_nonzero(alpha_values,data):
+def find_nonzero_values(alpha_values,data):
     alpha = []
     points = []
     epsilon = 0.00001
@@ -62,8 +62,8 @@ def build_nonzero(alpha_values,data):
             points.append(data[i])
     return np.array(points)
 
-#tells us which side of the decision boundary the point in on
-def build_indicator(alpha,points):
+#which uses the non-zero alpha values (support vectors) with their xi's to classify new points
+def indicator(x, y):
     res = 0.0
     for i in range(len(alpha)):
         res += alpha[i]*T[i]*linear_kernel(points,points[i])
@@ -76,11 +76,8 @@ G = build_G(N)
 h = build_h(N)
 
 r = qp(matrix(P) , matrix(q) , matrix(G) , matrix(h))
-alpha = list(r['x'])
-
-points = build_nonzero(alpha,data)
-indicator = build_indicator(alpha,points)
-##print(indicator)
+alpha_values = list(r['x'])
+support_vectors = find_nonzero_values(alpha_values,data)
 
 ## Plot test data
 pylab.hold (True) 
@@ -96,6 +93,7 @@ pylab.show()
 xrange = np.arange(-4, 4, 0.05)
 yrange = np.arange(-4, 4, 0.05)
 
+## Iterate through all of the data points and
 grid = matrix([[indicator(x,y)
                 for y in yrange]
                for x in xrange])
